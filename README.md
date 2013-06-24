@@ -96,7 +96,7 @@ All Initr dependencies can handle these properties.
 
 * `deps` An array of strings of file paths to scripts needed to be loaded before your `src` script.
 
-### Types
+## Types
 
 The example above doesn't tell you much about how Initr really works yet, but you can probably start to see where this is going. Give a quick once over on the code above. You can see three different types which are built into Initr, then another with no type.
 
@@ -104,7 +104,7 @@ All of the typed dependencies can include a `done` function. This function will 
 
 Now, let's break down the types of dependencies we can pass into `initr`.
 
-#### $.fn
+### $.fn
 
 On a large, multi-page website, you probably are working with lots of different jQuery plugins. The type `$.fn` handles loading and initializing these.
 
@@ -262,7 +262,7 @@ It will basically be the equivalent of doing this:
 
 You can see how the `$.fn` type can be useful. Its all about identifying all of the needs of your site, and being able to easily configure your options. All while not worry about what page which plugin and of which type needs to be kicked off.
 
-#### $
+### $
 
 jQuery functionality doesn't just sit on its prototype (`$.fn`), it also lives right on the jQuery global object. This is a much smaller use case, that you may not run into. But here is an example that sums it up pretty well. It works in a very similar way to `$.fn`, but it uses `selector` or `validate` as a means to run or not run your code.
 
@@ -298,7 +298,7 @@ This is the (semi) equivalent of:
 		}
 	</script>
 
-#### app
+### app
 
 For large and complicated multi-page sites, jQuery plugins only get you part of the way. Sometimes you have to roll your sleeves up and actually write some code (thank goodness). This code wont always be some small snippet, it could be its own beast of a script, with its own dependencies. We don't want to put all of this logic in our Initr dependency object. We want it to be in its own file, neatly bundled up to do what it does. The `app` type sets out to fill this concept of *modules*. Lets look at another example.
 
@@ -366,7 +366,7 @@ Then, inside of our IIFE ([Immediately-Invoked Function Expression](http://benal
 
 You can really do whatever you want with your module, as long as it is sitting on the `app` global namespace and has an `init` function defined. The `init` function will be passed the jQuery object containing your elements based on your `selector` for the first argument, and the second is the actual dependency object itself (which you may or may not need - this just allows you to stash data in your dependency and pass it to your module if you want).
 
-#### Anonymous Dependencies
+### Anonymous Dependencies
 
 Sometimes you have small pieces of functionality, that doesn't really need their own `app` dependency. This is where we can omit the `type` property from our dependency, and just use a `selector` (and/or a `validate` function if you want/need). Example time:
 
@@ -398,6 +398,6 @@ This is the (semi) equivalent of:
 
 Again, all of these "dependencies" serve to contain logic into pieces that are easy to see and work with. Your selectors are always checked before running to make sure you actually have elements to operate on. These anonymous modules should only be used for very small pieces of code, otherwise you should use the `app` type.
 
-### Events
+## Events
 
 Docs coming soon.
