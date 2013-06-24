@@ -144,6 +144,9 @@ Initr.prototype.run = function( depName ) {
 Initr.prototype.addDone = function( dep, $els ) {
 	var handle = dep.name || dep.handle;
 	this.done[ handle ] = [ $els, dep ];
+	if ( dep.done ) {
+		dep.done( $els, dep );
+	}
 	this.trigger( handle + ':done', $els, dep );
 };
 
