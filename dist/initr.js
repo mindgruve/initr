@@ -1,4 +1,4 @@
-/*! Initr - v0.1.0 - 2013-06-21
+/*! Initr - v0.1.0 - 2013-06-24
 * https://github.com/mindgruve/initr
 * Copyright (c) 2013 Chris Kihneman | Mindgruve; Licensed MIT */
 ( function( $, window, undefined ) {
@@ -139,6 +139,9 @@ Initr.prototype.run = function( depName ) {
 Initr.prototype.addDone = function( dep, $els ) {
 	var handle = dep.name || dep.handle;
 	this.done[ handle ] = [ $els, dep ];
+	if ( dep.done ) {
+		dep.done( $els, dep );
+	}
 	this.trigger( handle + ':done', $els, dep );
 };
 
