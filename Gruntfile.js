@@ -62,6 +62,15 @@ module.exports = function(grunt) {
         tasks: ['jshint:src']
       },
     },
+    connect: {
+      server: {
+        options: {
+          port: 9001,
+          base: './',
+          keepalive : true
+        }
+      }
+    },
   });
 
   // These plugins provide necessary tasks.
@@ -71,10 +80,16 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-qunit');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-connect');
 
   // Default task.
   // No tests yet.
   // grunt.registerTask('default', ['jshint', 'qunit', 'clean', 'concat', 'uglify']);
   grunt.registerTask('default', ['jshint', 'clean', 'concat', 'uglify']);
+
+  // A quick server task for easy demo viewing.
+  // Run `grunt server` from the command line.
+  // Navigate to `http://localhost:9001/demos/` in your browser.
+  grunt.registerTask('server', ['default', 'connect']);
 
 };
