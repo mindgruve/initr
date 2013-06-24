@@ -70,7 +70,7 @@ Include jQuery and Initr. Then call `initr` with the path to all of your JavaScr
 
 **Don't forget**, put your most important dependencies before others. These dependencies will be run in the array's order. If you need things to kick off right away, put them at the top.
 
-**For a complete, working example, clone this repo and review the files in the `demos` folder.**
+**For a complete, working example, clone this repo and review the files in the `demos` folder.** After cloning, be sure to run `npm install` to get the needed node modules. Also, you can run `grunt server` to boot up a quick web server to view the demos. The default port is `9001`. After booting up the demo, you can navigate to `http://localhost:9001/demos/` in your browser.
 
 If you are in development, it is best to put Initr into development mode to show logs in your `console` for everything Initr does. Set this before calling `initr`. It is off by default.
 
