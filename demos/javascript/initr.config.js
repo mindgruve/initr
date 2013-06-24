@@ -46,6 +46,11 @@
 			defaults : {
 				showOtherMonths: true,
 				selectOtherMonths: true
+			},
+
+			// Optional `done` function to be called after plugin has been loaded and called.
+			done : function( $els, dep ) {
+				console.log( 'datepicker is loaded and has been called.', $els, dep );
 			}
 
 			// We now have a solution to initialize a datepicker on any page of your website.

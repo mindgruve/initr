@@ -68,6 +68,8 @@ Include jQuery and Initr. Then call `initr` with the path to all of your JavaScr
 		// As many dependencies as you need...
 	]);
 
+It is recommended that you put this code in a file named `initr.config.js`, and include it after jQuery and Initr.
+
 **Don't forget**, put your most important dependencies before others. These dependencies will be run in the array's order. If you need things to kick off right away, put them at the top.
 
 **For a complete, working example, clone this repo and review the files in the `demos` folder.** After cloning, be sure to run `npm install` to get the needed node modules. Also, you can run `grunt server` to boot up a quick web server to view the demos, otherwise you will run into cross site scripting issues. The default port is `9001`. After booting up the server, navigate to `http://localhost:9001/demos/` in your browser.
@@ -96,7 +98,11 @@ All Initr dependencies can handle these properties.
 
 ### Types
 
-The example above doesn't tell you much about how Initr really works yet, but you can probably start to see where this is going. Give a quick once over on the code above. You can see three different types which are built into Initr, then another with no type. Now, let's break down the types of dependencies we can pass into `initr`.
+The example above doesn't tell you much about how Initr really works yet, but you can probably start to see where this is going. Give a quick once over on the code above. You can see three different types which are built into Initr, then another with no type.
+
+All of the typed dependencies can include a `done` function. This function will be called after the dependency has been loaded and called. It is passed elements found from your `selector`, as well as the dependency itself. View `demos/javascript/initr.config.js` for a working example.
+
+Now, let's break down the types of dependencies we can pass into `initr`.
 
 #### $.fn
 
