@@ -460,6 +460,7 @@ var initrRef = initr( 'path/to/your/scripts/', [
 		handle : 'datepicker',
 		src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
 		selector : '.datepicker'
+	}
 ]);
 
 // Use `initr`'s on method to attach a done event for `datepicker`.
@@ -484,6 +485,7 @@ initr( 'path/to/your/scripts/', [
 		done : function( $els, dep ) {
 			// Do stuff...
 		}
+	}
 ]);
 ```
 
@@ -498,6 +500,7 @@ var initrRef = initr( 'path/to/your/scripts/', [
 		handle : 'datepicker',
 		src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
 		selector : '.datepicker'
+	}
 ]);
 
 // Run it by the dependency `handle`, or optionally by `name`.
