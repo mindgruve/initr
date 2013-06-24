@@ -90,6 +90,6 @@ module.exports = function(grunt) {
   // A quick server task for easy demo viewing.
   // Run `grunt server` from the command line.
   // Navigate to `http://localhost:9001/demos/` in your browser.
-  grunt.registerTask('server', ['default', 'connect']);
+  grunt.registerTask('server', ['jshint', 'connect']);
 
 };
