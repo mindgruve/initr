@@ -400,4 +400,66 @@ Again, all of these "dependencies" serve to contain logic into pieces that are e
 
 ## Events
 
-Docs coming soon.
+There may be situations where you need to know when a particular dependency has been loaded and fired. You can attach events to Initr to handle this.
+
+	// Call `initr` and cache a reference to it.
+	var initrRef = initr( 'path/to/your/scripts/', [
+		{
+			type : '$.fn',
+			handle : 'datepicker',
+			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+			selector : '.datepicker'
+	]);
+
+	// Use `initr`'s on method to attach a done event for `datepicker`.
+	initrRef.on( 'datepicker', function( $els, dep ) {
+		console.log( 'datepicker:done', $els, dep );
+	});
+
+In this example, we are going to wait for the `datepicker` dependency to finish loading and running, then our callback function will be called with `$els` found from your `selector` and `dep` (your dependency object).
+
+The name of the event (in this case, `datepicker`) is determined by your dependency `handle`. You can also choose to alias it a step further with by adding a `name` parameter.
+
+**Don't forget**, as another option, you can just add a `done` function to your dependency to be called once it's loaded and initialized.
+
+	initr( 'path/to/your/scripts/', [
+		{
+			type : '$.fn',
+			handle : 'datepicker',
+			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+			selector : '.datepicker',
+			done : function( $els, dep ) {
+				// Do stuff...
+			}
+	]);
+
+## Re-Running
+
+There may be situations where you need to run a dependency again. Here is an example of the api for doing this.
+
+	var initrRef = initr( 'path/to/your/scripts/', [
+		{
+			type : '$.fn',
+			handle : 'datepicker',
+			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+			selector : '.datepicker'
+	]);
+
+	// Run it by the dependency `handle`, or optionally by `name`.
+	initrRef.run( 'datepicker' );
+
+## TL;DR
+
+Check out the demo in the `demos` folder.
+
+1. Clone this repo, `git clone https://github.com/mindgruve/initr.git initr`. Then `cd initr`.
+
+2. Run `npm install`.
+
+3. Run `grunt server`.
+
+4. Navigate to `http://localhost:9001/demos/` in your browser.
+
+5. Open up `demos/index.html` and `demos/javascript/initr.config.js` in your text editor and take a look.
+
+Enjoy!
