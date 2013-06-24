@@ -20,9 +20,9 @@ Traditionally, frontend developers employ one of a few techniques to run their J
 
 I think it is obvious that as our sites get bigger, our task on the frontend becomes increasingly more difficult. The time has come to organize ourselves in a better way, where anyone on the team can follow along, and figure out how the code is running.
 
-On the frontend, it is always our goal to build small, versatile, reusable pieces of code. Thinking modular pays off quickly. It is not always ease to just keep one `scripts.js` file with all of our initialization code, as well as custom functionality. In no time you end up a thousand lines of code deep, madly commenting to attempt to keep yourself in line. It becomes harder and harder for your team to interact with this file, the structure gets locked in one persons head, and forget two people working on it at the same time.
+On the frontend, it is always our goal to build small, versatile, reusable pieces of code. Thinking modular pays off quickly. It is not always easy to just keep one `scripts.js` file with all of our initialization code, as well as custom functionality. In no time you end up a thousand lines of code deep, madly commenting to attempt to keep yourself in line. It becomes harder and harder for your team to interact with this file, the structure gets locked in one person's head, and forget two people working on it at the same time.
 
-Where does this leave us? Well, we have plugins (probably jQuery or of another framework), libraries (jQuery, google maps, third party folk, etc.) and custom pieces of functionality built specifically for your site. Initr was built around working with these concepts, and it was built to make the frontend dead simple and thoughtless. Write solutions once, allow it to work everywhere - on demand, only when needed.
+Where does this leave us? Well, we have plugins (probably jQuery or another framework), libraries (jQuery, google maps, third party folk, etc.) and custom pieces of functionality built specifically for your site. Initr was built around working with these concepts, and it was built to make the frontend dead simple and thoughtless. Write solutions once, allow it to work everywhere - on demand, only when needed.
 
 ## How do I use it?
 
@@ -263,7 +263,7 @@ jQuery functionality doesn't just sit on its prototype (`$.fn`), it also lives r
 HTML:
 
 	<form>
-		<!-- Some for elements -->
+		<!-- Some form elements -->
 	</form>
 
 Initr code:
