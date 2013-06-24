@@ -61,7 +61,7 @@ Include jQuery and Initr. Then call `initr` with the path to all of your JavaScr
 		},
 		{
 			selector : '.your-selector',
-			init : function( dep, $els ) {
+			init : function( $els, dep ) {
 				// Do stuff...
 			}
 		}
@@ -375,7 +375,7 @@ Initr code:
 	initr( 'path/to/your/scripts/', [
 		{
 			selector : '.your-selector',
-			init : function( dep, $els ) {
+			init : function( $els, dep ) {
 				// Do stuff...
 			}
 		}
@@ -391,3 +391,7 @@ This is the (semi) equivalent of:
 	</script>
 
 Again, all of these "dependencies" serve to contain logic into pieces that are easy to see and work with. Your selectors are always checked before running to make sure you actually have elements to operate on. These anonymous modules should only be used for very small pieces of code, otherwise you should use the `app` type.
+
+### Events
+
+Docs coming soon.
