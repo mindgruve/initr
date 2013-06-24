@@ -68,7 +68,7 @@ Include jQuery and Initr. Then call `initr` with the path to all of your JavaScr
 		// As many dependencies as you need...
 	]);
 
-**Don't forget**, put your most important dependencies before others. These dependencies will be tried in the order of the array's order. If you need things to kick off right away, put them at the top.
+**Don't forget**, put your most important dependencies before others. These dependencies will be run in the array's order. If you need things to kick off right away, put them at the top.
 
 **For a complete, working example, clone this repo and review the files in the `demos` folder.**
 
