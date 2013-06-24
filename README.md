@@ -28,45 +28,47 @@ Where does this leave us? Well, we have plugins (probably jQuery or another fram
 
 Include jQuery and Initr. Then call `initr` with the path to all of your JavaScript and an array of objects containing all of your dependencies, which represent every piece of functionality on your site.
 
-	initr( 'path/to/your/scripts/', [
-		{
-			type : '$.fn',
-			handle : 'datepicker',
-			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
-			selector : '.datepicker',
-			defaults : {
-				inline: true,
-				showOtherMonths: true,
-				selectOtherMonths: true
-			}
-		},
-		{
-			type : '$',
-			handle : 'formIt',
-			src : 'vendor/jquery.formit.js',
-			selector : 'form',
-			defaults : {
-				checkboxHtml : '<span class="ss-icon">&#x2713;</span>'
-			}
-		},
-		{
-			type : 'app',
-			handle : 'yourModule',
-			src : 'app.yourModule.js',
-			deps : [ 'helpers.js' ],
-			selector : '[data-plugin=yourModule]',
-			validate : function( $els, dep ) {
-				return $els && ($els.length > 2);
-			}
-		},
-		{
-			selector : '.your-selector',
-			init : function( $els, dep ) {
-				// Do stuff...
-			}
+```javascript
+initr( 'path/to/your/scripts/', [
+	{
+		type : '$.fn',
+		handle : 'datepicker',
+		src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+		selector : '.datepicker',
+		defaults : {
+			inline: true,
+			showOtherMonths: true,
+			selectOtherMonths: true
 		}
-		// As many dependencies as you need...
-	]);
+	},
+	{
+		type : '$',
+		handle : 'formIt',
+		src : 'vendor/jquery.formit.js',
+		selector : 'form',
+		defaults : {
+			checkboxHtml : '<span class="ss-icon">&#x2713;</span>'
+		}
+	},
+	{
+		type : 'app',
+		handle : 'yourModule',
+		src : 'app.yourModule.js',
+		deps : [ 'helpers.js' ],
+		selector : '[data-plugin=yourModule]',
+		validate : function( $els, dep ) {
+			return $els && ($els.length > 2);
+		}
+	},
+	{
+		selector : '.your-selector',
+		init : function( $els, dep ) {
+			// Do stuff...
+		}
+	}
+	// As many dependencies as you need...
+]);
+```
 
 It is recommended that you put this code in a file named `initr.config.js`, and include it after jQuery and Initr.
 
@@ -76,11 +78,15 @@ It is recommended that you put this code in a file named `initr.config.js`, and 
 
 If you are in development, it is best to put Initr into development mode to show logs in your `console` for everything Initr does. Set this before calling `initr`. It is off by default.
 
-	initr.isDev = true;
+```javascript
+initr.isDev = true;
+```
 
 If you would like to set a timeout for your fetched scripts, define it like so:
 
-	initr.timeout = 12000;
+```javascript
+initr.timeout = 12000;
+```
 
 All Initr dependencies can handle these properties.
 
@@ -120,35 +126,43 @@ Lets look at the example above for a simple `$.fn` initialization. Here is the a
 
 HTML:
 
-	<div class="datepicker"></div>
+```html
+<div class="datepicker"></div>
+```
 
 Initr code:
 
-	initr( 'path/to/your/scripts/', [
-		{
-			type : '$.fn',
-			handle : 'datepicker',
-			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
-			selector : '.datepicker',
-			defaults : {
-				inline: true,
-				showOtherMonths: true,
-				selectOtherMonths: true
-			}
-		}
-	]);
-
-This is the (semi) equivalent of:
-
-	<script src="path/to/your/scripts/vendor/jquery-ui-1.9.2.datepicker-custom.min.js"></script>
-
-	<script>
-		$('.datepicker').datepicker({
+```javascript
+initr( 'path/to/your/scripts/', [
+	{
+		type : '$.fn',
+		handle : 'datepicker',
+		src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+		selector : '.datepicker',
+		defaults : {
 			inline: true,
 			showOtherMonths: true,
 			selectOtherMonths: true
-		})
+		}
+	}
+]);
+```
+
+This is the (semi) equivalent of:
+
+```html
+<script src="path/to/your/scripts/vendor/jquery-ui-1.9.2.datepicker-custom.min.js"></script>
+
+	<script>
+
+	$('.datepicker').datepicker({
+		inline: true,
+		showOtherMonths: true,
+		selectOtherMonths: true
+	});
+
 	</script>
+```
 
 Initr handles `$.fn` like this.
 
@@ -164,53 +178,57 @@ Now, this fulfills simple use cases for plugins, but what if you have a plugin t
 
 HTML:
 
-	<div data-plugin="slideshow" data-type="featured">
-		<!-- Slides -->
-	</div>
+```html
+<div data-plugin="slideshow" data-type="featured">
+	<!-- Slides -->
+</div>
 
-	<div data-plugin="slideshow" data-type="featuredInline">
-		<!-- Slides -->
-	</div>
+<div data-plugin="slideshow" data-type="featuredInline">
+	<!-- Slides -->
+</div>
 
-	<div data-plugin="slideshow" data-type="photo">
-		<!-- Slides -->
-	</div>
+<div data-plugin="slideshow" data-type="photo">
+	<!-- Slides -->
+</div>
+```
 
 Initr code:
 
-	initr( 'path/to/your/scripts/', [
-		{
-			type : '$.fn',
-			handle : 'anythingSlider',
-			src : 'vendor/jquery.anythingslider.min.js',
-			deps : [ 'app.gallery-helpers.js' ],
-			selector : '[data-plugin="slideshow"]',
-			defaults : {
-				mode : 'fade',
-				hashTags : false
-			},
-			types : {
-				featured : {
-					autoPlay : true,
-					delay : 5000,
-					onBeforeInitialize : function( e, slider ) {
-						app.galleryHelpers.loadPlaceholders( slider.$el );
-					},
-					onSlideComplete : function( slider ) {
-						app.galleryHelpers.trackView( app.galleryHelpers.getData(slider, 'inline') );
-					}
+```javascript
+initr( 'path/to/your/scripts/', [
+	{
+		type : '$.fn',
+		handle : 'anythingSlider',
+		src : 'vendor/jquery.anythingslider.min.js',
+		deps : [ 'app.gallery-helpers.js' ],
+		selector : '[data-plugin="slideshow"]',
+		defaults : {
+			mode : 'fade',
+			hashTags : false
+		},
+		types : {
+			featured : {
+				autoPlay : true,
+				delay : 5000,
+				onBeforeInitialize : function( e, slider ) {
+					app.galleryHelpers.loadPlaceholders( slider.$el );
 				},
-				featuredInline : {
-					autoPlay : false,
-					buildStartStop : false
-				},
-				photo : {
-					buildNavigation : false,
-					buildStartStop : false
+				onSlideComplete : function( slider ) {
+					app.galleryHelpers.trackView( app.galleryHelpers.getData(slider, 'inline') );
 				}
+			},
+			featuredInline : {
+				autoPlay : false,
+				buildStartStop : false
+			},
+			photo : {
+				buildNavigation : false,
+				buildStartStop : false
 			}
 		}
-	]);
+	}
+]);
+```
 
 We can see we have three different types of slideshows that need to be initialized. We use `data-plugin="slideshow"` in our HTML to identify all of the slideshows. Then we use `data-type` to identify which type of slideshow it is. Initr will do this:
 
@@ -228,37 +246,41 @@ We can see we have three different types of slideshows that need to be initializ
 
 It will basically be the equivalent of doing this:
 
-	<script src="path/to/your/scripts/app.gallery-helpers.js"></script>
-	<script src="path/to/your/scripts/vendor/jquery.anythingslider.min.js"></script>
+```html
+<script src="path/to/your/scripts/app.gallery-helpers.js"></script>
+<script src="path/to/your/scripts/vendor/jquery.anythingslider.min.js"></script>
 
 	<script>
-		$('[data-plugin="slideshow"][data-type="featured"]').anythingSlider({
-			mode : 'fade',
-			hashTags : false,
-			autoPlay : true,
-			delay : 5000,
-			onBeforeInitialize : function( e, slider ) {
-				app.galleryHelpers.loadPlaceholders( slider.$el );
-			},
-			onSlideComplete : function( slider ) {
-				app.galleryHelpers.trackView( app.galleryHelpers.getData(slider, 'inline') );
-			}
-		});
 
-		$('[data-plugin="slideshow"][data-type="featuredInline"]').anythingSlider({
-			mode : 'fade',
-			hashTags : false,
-			autoPlay : false,
-			buildStartStop : false
-		});
+	$('[data-plugin="slideshow"][data-type="featured"]').anythingSlider({
+		mode : 'fade',
+		hashTags : false,
+		autoPlay : true,
+		delay : 5000,
+		onBeforeInitialize : function( e, slider ) {
+			app.galleryHelpers.loadPlaceholders( slider.$el );
+		},
+		onSlideComplete : function( slider ) {
+			app.galleryHelpers.trackView( app.galleryHelpers.getData(slider, 'inline') );
+		}
+	});
 
-		$('[data-plugin="slideshow"][data-type="photo"]').anythingSlider({
-			mode : 'fade',
-			hashTags : false,
-			buildNavigation : false,
-			buildStartStop : false
-		});
+	$('[data-plugin="slideshow"][data-type="featuredInline"]').anythingSlider({
+		mode : 'fade',
+		hashTags : false,
+		autoPlay : false,
+		buildStartStop : false
+	});
+
+	$('[data-plugin="slideshow"][data-type="photo"]').anythingSlider({
+		mode : 'fade',
+		hashTags : false,
+		buildNavigation : false,
+		buildStartStop : false
+	});
+
 	</script>
+```
 
 You can see how the `$.fn` type can be useful. Its all about identifying all of the needs of your site, and being able to easily configure your options. All while not worry about what page which plugin and of which type needs to be kicked off.
 
@@ -268,35 +290,43 @@ jQuery functionality doesn't just sit on its prototype (`$.fn`), it also lives r
 
 HTML:
 
-	<form>
-		<!-- Some form elements -->
-	</form>
+```html
+<form>
+	<!-- Some form elements -->
+</form>
+```
 
 Initr code:
 
-	initr( 'path/to/your/scripts/', [
-		{
-			type : '$',
-			handle : 'formIt',
-			src : 'vendor/jquery.formit.js',
-			selector : 'form',
-			defaults : {
-				checkboxHtml : '<span class="ss-icon">&#x2713;</span>'
-			}
+```javascript
+initr( 'path/to/your/scripts/', [
+	{
+		type : '$',
+		handle : 'formIt',
+		src : 'vendor/jquery.formit.js',
+		selector : 'form',
+		defaults : {
+			checkboxHtml : '<span class="ss-icon">&#x2713;</span>'
 		}
-	]);
+	}
+]);
+```
 
 This is the (semi) equivalent of:
 
-	<script src="path/to/your/scripts/vendor/jquery.formit.js"></script>
+```html
+<script src="path/to/your/scripts/vendor/jquery.formit.js"></script>
 
 	<script>
-		if ( $('form').length ) {
-			$.formIt({
-				checkboxHtml : '<span class="ss-icon">&#x2713;</span>'
-			});
-		}
+
+	if ( $('form').length ) {
+		$.formIt({
+			checkboxHtml : '<span class="ss-icon">&#x2713;</span>'
+		});
+	}
+
 	</script>
+```
 
 ### app
 
@@ -304,65 +334,77 @@ For large and complicated multi-page sites, jQuery plugins only get you part of 
 
 HTML:
 
-	<div data-plugin="yourModule">
-		<!-- Your module HTML -->
-	</div>
+```html
+<div data-plugin="yourModule">
+	<!-- Your module HTML -->
+</div>
+```
 
 Initr code:
 
-	initr( 'path/to/your/scripts/', [
-		{
-			type : 'app',
-			handle : 'yourModule',
-			src : 'app.yourModule.js',
-			deps : [ 'helpers.js' ],
-			selector : '[data-plugin=yourModule]',
-			validate : function( $els, dep ) {
-				return $els && ($els.length > 2);
-			}
+```javascript
+initr( 'path/to/your/scripts/', [
+	{
+		type : 'app',
+		handle : 'yourModule',
+		src : 'app.yourModule.js',
+		deps : [ 'helpers.js' ],
+		selector : '[data-plugin=yourModule]',
+		validate : function( $els, dep ) {
+			return $els && ($els.length > 2);
 		}
-	]);
+	}
+]);
+```
 
 This is the (semi) equivalent of:
 
-	<script src="path/to/your/scripts/helpers.js"></script>
-	<script src="path/to/your/scripts/app.yourModule.js"></script>
+```html
+<script src="path/to/your/scripts/helpers.js"></script>
+<script src="path/to/your/scripts/app.yourModule.js"></script>
 
 	<script>
-		var $els = $('[data-plugin=yourModule]');
-		if ( $els && $els.length > 2 ) {
-			app.yourModule.init( $els );
-		}
+
+	var $els = $('[data-plugin=yourModule]');
+	if ( $els && $els.length > 2 ) {
+		app.yourModule.init( $els );
+	}
+
 	</script>
+```
 
 So we can see, Initr checks your `selector` and `validate` function (just as it does for other types), loads your scripts, and calls your modules `init` function. **This is the rather opinionated part.** You must create your `app` modules in a slightly particular way for them to be called properly. If you want to use `app` modules, you need to create the `app` var in the global namespace. I prefer to wrap all of my modules in this code to ensure `app` exists, and so I don't have to worry about what order the modules are initialized in.
 
-	( function( $, app, window ) {
+```javascript
+( function( $, app, window ) {
 
-		// Your module code...
+	// Your module code...
 
-	})( jQuery, window.app || (window.app = {}), window );
+})( jQuery, window.app || (window.app = {}), window );
+```
 
 Then, inside of our IIFE ([Immediately-Invoked Function Expression](http://benalman.com/news/2010/11/immediately-invoked-function-expression/)), define your module.
 
-	( function( $, app, window ) {
+```javascript
+( function( $, app, window ) {
 
-		var yourModule = {
-			aProperty : 'some text',
-			init : function( $els, dep ) {
+	var yourModule = {
+		aProperty : 'some text',
+		init : function( $els, dep ) {
 
-				// Your module's initilization functionality...
-				yourModule.anotherMethod( yourModule.aProperty );
-			},
-			anotherMethod : function() {
+			// Your module's initilization functionality...
+			yourModule.anotherMethod( yourModule.aProperty );
+		},
+		anotherMethod : function() {
 
-				// Some other functionality...
-			}
-		};
+			// Some other functionality...
+		}
+	};
 
-		app.yourModule = yourModule;
+	app.yourModule = yourModule;
 
-	})( jQuery, window.app || (window.app = {}), window );
+})( jQuery, window.app || (window.app = {}), window );
+```
 
 You can really do whatever you want with your module, as long as it is sitting on the `app` global namespace and has an `init` function defined. The `init` function will be passed the jQuery object containing your elements based on your `selector` for the first argument, and the second is the actual dependency object itself (which you may or may not need - this just allows you to stash data in your dependency and pass it to your module if you want).
 
@@ -372,29 +414,37 @@ Sometimes you have small pieces of functionality, that doesn't really need their
 
 HTML:
 
-	<div class="your-selector">
-		<!-- Your HTML -->
-	</div>
+```html
+<div class="your-selector">
+	<!-- Your HTML -->
+</div>
+```
 
 Initr code:
 
-	initr( 'path/to/your/scripts/', [
-		{
-			selector : '.your-selector',
-			init : function( $els, dep ) {
-				// Do stuff...
-			}
+```javascript
+initr( 'path/to/your/scripts/', [
+	{
+		selector : '.your-selector',
+		init : function( $els, dep ) {
+			// Do stuff...
 		}
-	]);
+	}
+]);
+```
 
 This is the (semi) equivalent of:
 
+```html
 	<script>
-		var $els = $('.your-selector');
-		if ( $els.length ) {
-			// Do stuff...
-		}
+
+	var $els = $('.your-selector');
+	if ( $els.length ) {
+		// Do stuff...
+	}
+
 	</script>
+```
 
 Again, all of these "dependencies" serve to contain logic into pieces that are easy to see and work with. Your selectors are always checked before running to make sure you actually have elements to operate on. These anonymous modules should only be used for very small pieces of code, otherwise you should use the `app` type.
 
@@ -402,19 +452,21 @@ Again, all of these "dependencies" serve to contain logic into pieces that are e
 
 There may be situations where you need to know when a particular dependency has been loaded and fired. You can attach events to Initr to handle this.
 
-	// Call `initr` and cache a reference to it.
-	var initrRef = initr( 'path/to/your/scripts/', [
-		{
-			type : '$.fn',
-			handle : 'datepicker',
-			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
-			selector : '.datepicker'
-	]);
+```javascript
+// Call `initr` and cache a reference to it.
+var initrRef = initr( 'path/to/your/scripts/', [
+	{
+		type : '$.fn',
+		handle : 'datepicker',
+		src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+		selector : '.datepicker'
+]);
 
-	// Use `initr`'s on method to attach a done event for `datepicker`.
-	initrRef.on( 'datepicker', function( $els, dep ) {
-		console.log( 'datepicker:done', $els, dep );
-	});
+// Use `initr`'s on method to attach a done event for `datepicker`.
+initrRef.on( 'datepicker', function( $els, dep ) {
+	console.log( 'datepicker:done', $els, dep );
+});
+```
 
 In this example, we are going to wait for the `datepicker` dependency to finish loading and running, then our callback function will be called with `$els` found from your `selector` and `dep` (your dependency object).
 
@@ -422,31 +474,35 @@ The name of the event (in this case, `datepicker`) is determined by your depende
 
 **Don't forget**, as another option, you can just add a `done` function to your dependency to be called once it's loaded and initialized.
 
-	initr( 'path/to/your/scripts/', [
-		{
-			type : '$.fn',
-			handle : 'datepicker',
-			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
-			selector : '.datepicker',
-			done : function( $els, dep ) {
-				// Do stuff...
-			}
-	]);
+```javascript
+initr( 'path/to/your/scripts/', [
+	{
+		type : '$.fn',
+		handle : 'datepicker',
+		src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+		selector : '.datepicker',
+		done : function( $els, dep ) {
+			// Do stuff...
+		}
+]);
+```
 
 ## Re-Running
 
 There may be situations where you need to run a dependency again. Here is an example of the api for doing this.
 
-	var initrRef = initr( 'path/to/your/scripts/', [
-		{
-			type : '$.fn',
-			handle : 'datepicker',
-			src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
-			selector : '.datepicker'
-	]);
+```javascript
+var initrRef = initr( 'path/to/your/scripts/', [
+	{
+		type : '$.fn',
+		handle : 'datepicker',
+		src : 'vendor/jquery-ui-1.9.2.datepicker-custom.min.js',
+		selector : '.datepicker'
+]);
 
-	// Run it by the dependency `handle`, or optionally by `name`.
-	initrRef.run( 'datepicker' );
+// Run it by the dependency `handle`, or optionally by `name`.
+initrRef.run( 'datepicker' );
+```
 
 ## TL;DR
 
