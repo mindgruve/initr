@@ -153,15 +153,13 @@ This is the (semi) equivalent of:
 ```html
 <script src="path/to/your/scripts/vendor/jquery-ui-1.9.2.datepicker-custom.min.js"></script>
 
-	<script>
-
+<script>
 	$('.datepicker').datepicker({
 		inline: true,
 		showOtherMonths: true,
 		selectOtherMonths: true
 	});
-
-	</script>
+</script>
 ```
 
 Initr handles `$.fn` like this.
@@ -250,8 +248,7 @@ It will basically be the equivalent of doing this:
 <script src="path/to/your/scripts/app.gallery-helpers.js"></script>
 <script src="path/to/your/scripts/vendor/jquery.anythingslider.min.js"></script>
 
-	<script>
-
+<script>
 	$('[data-plugin="slideshow"][data-type="featured"]').anythingSlider({
 		mode : 'fade',
 		hashTags : false,
@@ -278,8 +275,7 @@ It will basically be the equivalent of doing this:
 		buildNavigation : false,
 		buildStartStop : false
 	});
-
-	</script>
+</script>
 ```
 
 You can see how the `$.fn` type can be useful. Its all about identifying all of the needs of your site, and being able to easily configure your options. All while not worry about what page which plugin and of which type needs to be kicked off.
@@ -317,15 +313,13 @@ This is the (semi) equivalent of:
 ```html
 <script src="path/to/your/scripts/vendor/jquery.formit.js"></script>
 
-	<script>
-
+<script>
 	if ( $('form').length ) {
 		$.formIt({
 			checkboxHtml : '<span class="ss-icon">&#x2713;</span>'
 		});
 	}
-
-	</script>
+</script>
 ```
 
 ### app
@@ -363,14 +357,12 @@ This is the (semi) equivalent of:
 <script src="path/to/your/scripts/helpers.js"></script>
 <script src="path/to/your/scripts/app.yourModule.js"></script>
 
-	<script>
-
+<script>
 	var $els = $('[data-plugin=yourModule]');
 	if ( $els && $els.length > 2 ) {
 		app.yourModule.init( $els );
 	}
-
-	</script>
+</script>
 ```
 
 So we can see, Initr checks your `selector` and `validate` function (just as it does for other types), loads your scripts, and calls your modules `init` function. **This is the rather opinionated part.** You must create your `app` modules in a slightly particular way for them to be called properly. If you want to use `app` modules, you need to create the `app` var in the global namespace. I prefer to wrap all of my modules in this code to ensure `app` exists, and so I don't have to worry about what order the modules are initialized in.
@@ -436,14 +428,12 @@ initr( 'path/to/your/scripts/', [
 This is the (semi) equivalent of:
 
 ```html
-	<script>
-
+<script>
 	var $els = $('.your-selector');
 	if ( $els.length ) {
 		// Do stuff...
 	}
-
-	</script>
+</script>
 ```
 
 Again, all of these "dependencies" serve to contain logic into pieces that are easy to see and work with. Your selectors are always checked before running to make sure you actually have elements to operate on. These anonymous modules should only be used for very small pieces of code, otherwise you should use the `app` type.
