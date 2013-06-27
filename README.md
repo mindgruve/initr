@@ -6,6 +6,8 @@ A JavaScript dependency loader and initializer.
 
 Initr was built to simplify working with jQuery and custom code for multi-page websites.
 
+View the [initr-sample](https://github.com/mindgruve/initr-sample) repo for a complete, working demo.
+
 Built by [Chris Kihneman](http://ckihneman.github.com/) at [Mindgruve](http://mindgruve.com/).
 
 ## Why did you make it?
