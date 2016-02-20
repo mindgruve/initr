@@ -1,282 +1,145 @@
-/*
- * initr
- * https://github.com/mindgruve/initr
- *
- * Copyright (c) 2013 Chris Kihneman
- * Licensed under the MIT license.
- */
+define(['jquery', 'console'], function ($, console) {
 
-( function( $, window, undefined ) {
+    /**
+     * Any instance of Initr comes with defaults. Here is where you should define those defaults
+     * All defaults can be overridden during initialization by passing an object with the same schema to the constructor
+     * Initr reads through the dom passed to it in the scope config variable. If none is set, the root document is used.
+     *
+     * @typedef {object} InitrConfig
+     * @property {HTMLDocument|HTMLDomNode} scope
+     * @memberof module:Initr
+     */
+    /**
+     * @type {InitrConfig}
+     */
+    var defaults = {
+        scope: document
+    };
+    /**
+     * It is important to note that regardless of how many Initr instances are initialized, the modules collection is static across all instances
+     * @type {object}
+     * @private
+     */
+    var _modules = {};
+    var _console = console;
+    var console = {
+        _noop: function(){},
+        _style: 'color:#09d;',
+        _shim: function (functionName) {
+            var _style = this._style;
+            return function () {
+                //convert arguments to an array
+                var fn = _console[functionName] || _console.log;
+                var args = Array.prototype.slice.call(arguments, 0);
+                if (fn.apply) {
+                    args.unshift(_style);
+                    args.unshift('%cInitr');
+                    fn.apply(_console, args);
+                } else {
+                    args.unshift('Initr:');
+                    fn(args);
+                }
+            }
+        }
+    };
+    console.log = console._shim('log');
+    console.info = console._shim('info');
+    console.debug = console._noop;//._shim('debug');
 
-var initr, types;
+    /**
+     * Initr has been redefined to use require.js.
+     * This is to move forward into a development process that has more support and established patterns.
+     * This initial version supports loading a requirejs module conditionally based on the existence of dom elements with specific selector patterns (ie. `data-plugin*=""`, `.some-class`).
+     *
+     * @constructor
+     * @exports Initr
+     * @param {InitrConfig} config
+     * @version 1.4.0
+     */
+    function Initr(config) {
 
-function Initr( rootPath, deps ) {
-	this.rootPath = rootPath || '';
-	this.deps = deps;
-	this.events = {};
-	this.done = {};
-	this.getDeps( deps );
-}
+        this.options = $.extend({}, defaults, config || {});
+        console.debug('Starting...', config, this.options);
+    }
 
-Initr.prototype.getDeps = function( deps ) {
+    Initr.prototype = {
+        /**
+         * Friendly load method only supports object or array.
+         *
+         * Examples:
+         *
+         *     initr.load({selector:'body',src:['myRequirejsModule']});
+         *
+         * @param {Object|Array} an object that conforms to the module config schema or array of said objects
+         * @api public
+         */
+        load: function (config) {
+            if (config && typeof config == 'object') {
+                //is this an array?
+                if (config.length) {
+                    this.loadArray(config);
+                } else {
+                    this.loadObject(config);
+                }
+            }
+        },
+        loadArray: function (configs) {
+            for (var i = 0; i < configs.length; i++) {
+                this.loadObject(configs[i]);
+            }
+        },
+        //TODO: create a moduleConfig object instance with the module arg below passed into it's constructor
+        loadObject: function (config) {
 
-	// Make sure we have dependencies to load
-	if ( !( deps && deps.length ) ) {
-		if ( initr.isDev ) {
-			console.log( '! Initr - no dependencies passed.' );
-		}
-		return;
-	}
+            //if there's a selector then look for it in this scope
+            var $selection = config.selector ? $(config.selector, this.options.scope) : false;
 
-	// Load and run each dependency
-	for ( var i = 0, l = deps.length; i < l; i++ ) {
-		this.getDep( deps[ i ] );
-	}
-};
+            if ($selection && $selection.length) {
+                console.debug('Selection found for "' + config.selector + '" in ', this.options.scope);
+                var src = this.normalizeSrc(config);
+                if (src) {
+                    console.debug('Loading sources...', src.join());
+                    this.loadSrc(src, function () {
+                        console.debug('Sources loaded...', src.join());
+                        //convert loaded modules in arguments to array
+                        var args = Array.prototype.slice.call(arguments, 0),
+                            modules = [];
+                        for (var i = 0; i < arguments.length; i++) {
+                            modules.push(this.initModule(arguments[i], config, $selection));
+                        }
+                        //TODO: use the modules array to expose some high level functionality
+                        _modules[config.name] = {
+                            config: config,
+                            modules: modules
+                        };
+                    });
+                }
+            }
+        },
+        initModule: function (module, config, selection) {
+            //TODO: a future version of Initr could automate initialization
+            //var moduleName =
+            //    typeof module == 'function' ?
+            //        (module.toString().match(/function ([^\(]+)/) || [0, 'MODULE ANONYMOUS'])[1] :
+            //        'MODULE OBJECT';
+            console.debug(config.name, /* moduleName,*/ 'config', config, selection.toArray());
+            return new module(config, selection, this);
+        },
+        loadSrc: function (src, callback) {
+            var _this = this;
+            require(src, function () {
+                callback.apply(_this, arguments);
+            });
+        },
+        normalizeSrc: function (module) {
+            return module.src ?
+                (typeof module.src == 'string' ? [module.src] : module.src) :
+                null;
+        },
+        getModules: function () {
+            return _modules;
+        }
+    };
 
-Initr.prototype.getDep = function( dep, isLoaded ) {
-	var $els,
-		_this = this;
-
-	// Check to see if selector is on current page
-	if ( dep.selector ) {
-		$els = $( dep.selector );
-
-		// If no matched elements, stop
-		if ( !$els.length ) {
-			if ( initr.isDev ) {
-				console.log( '! Initr - selector did not match any elements.', dep );
-			}
-			return;
-		}
-	}
-
-	// Check validate method if it exists
-	if ( dep.validate ) {
-
-		// If validate returns false, stop
-		if ( !dep.validate( $els, dep ) ) {
-			if ( initr.isDev ) {
-				console.log( '! Initr - validate function did not pass.', dep );
-			}
-			return;
-		}
-	}
-
-	// Check for scripts to load
-	if ( (dep.src || dep.deps) && !isLoaded ) {
-		this.loadDep( dep )
-			.done( function() {
-				_this.initDep( dep, $els );
-			})
-			.fail( function() {
-				if ( initr.isDev ) {
-					console.log( '! Initr:error - failed to load dependencies.', dep );
-				}
-			});
-	} else {
-		this.initDep( dep, $els );
-	}
-};
-
-Initr.prototype.loadDep = function( dep ) {
-	var scripts = dep.deps || [];
-	if ( dep.src ) {
-		scripts.push( dep.src );
-	}
-
-	// Load all scripts
-	return Initr.getScripts( scripts, this.rootPath );
-};
-
-Initr.prototype.initDep = function( dep, $els ) {
-	if ( dep.type && types[ dep.type ] ) {
-		return types[ dep.type ].run.call( this, dep, $els );
-	}
-	if ( dep.init ) {
-		if ( initr.isDev ) {
-			console.log( '- Initr:anonymous -', dep );
-		}
-		dep.init( $els, dep );
-	} else {
-		if ( initr.isDev ) {
-			console.log( '! Initr:error:anonymous - no `init` function.', dep );
-		}
-	}
-};
-
-// Event Handling
-Initr.prototype.on = function( eventName, callback ) {
-	var events;
-
-	if ( !(eventName && callback) ) {
-		return;
-	}
-	eventName = Initr.normalizeEventName( eventName );
-	events = this.events[ eventName ];
-
-	if ( !events ) {
-		events = $.Callbacks();
-		this.events[ eventName ] = events;
-	}
-	events.add( callback );
-
-	var doneArr = this.done[ eventName.split(':')[0] ];
-	if ( doneArr ) {
-		callback.apply( null, doneArr );
-	}
-};
-
-Initr.prototype.trigger = function( eventName, $els, dep ) {
-	if ( !(eventName && this.events[eventName]) ) {
-		return;
-	}
-	this.events[eventName].fire( $els, dep );
-};
-
-Initr.prototype.run = function( depName ) {
-	var doneArr = this.done[ depName ];
-	if ( doneArr && doneArr[1] ) {
-		this.getDep( doneArr[1], true );
-	}
-};
-
-Initr.prototype.addDone = function( dep, $els ) {
-	var handle = dep.name || dep.handle;
-	this.done[ handle ] = [ $els, dep ];
-	if ( dep.done ) {
-		dep.done( $els, dep );
-	}
-	this.trigger( handle + ':done', $els, dep );
-};
-
-// Helpers
-Initr.normalizeEventName = function( eventName ) {
-	var parts;
-	eventName = $.trim( eventName );
-
-	parts = eventName.split( ':' );
-
-	if ( parts.length === 1 || !parts[1] ) {
-		eventName = parts[0] + ':done';
-	}
-	return eventName;
-};
-
-Initr.regHttp = /^https?:\/\//;
-
-Initr.getScripts = function( scripts, rootPath ) {
-	var i, l, script, options,
-		deferreds = [];
-	if ( !rootPath ) {
-		rootPath = '';
-	}
-	for ( i = 0, l = scripts.length; i < l; i++ ) {
-		script = scripts[ i ];
-		if ( !Initr.regHttp.test(script) ) {
-			script = rootPath + script;
-		}
-		options = {
-			type : 'GET',
-			url  : script,
-			dataType : 'script',
-			cache : true
-		};
-		if ( initr.timeout ) {
-			options.timeout = initr.timeout;
-		}
-		deferreds.push(
-			$.ajax( options )
-		);
-	}
-	return $.when.apply( null, deferreds );
-};
-
-Initr.checkHandle = function( dep, obj, objName ) {
-	if ( !(dep && dep.handle) ) {
-		if ( initr.isDev ) {
-			console.log( '! Initr:error:' + objName + ' - no dependency handle.', dep );
-		}
-		return false;
-	}
-
-	if ( !(obj && obj[ dep.handle ]) ) {
-		if ( initr.isDev ) {
-			console.log( '! Initr:error:' + objName + ' - handle does not exist on `$.fn`.', dep );
-		}
-		return false;
-	}
-
-	return true;
-};
-
-types = {
-	'$.fn' : {
-		run : function( dep, $els ) {
-			if ( !Initr.checkHandle( dep, window.$ && window.$.fn, '$.fn' ) ) {
-				return;
-			}
-			if ( !dep.types ) {
-				if ( initr.isDev ) {
-					console.log( '- Initr:run:$.fn - no types.', dep.handle, dep );
-				}
-				$els[ dep.handle ]( dep.defaults );
-			} else {
-				$els.each( function() {
-					var $el = $( this ),
-						typeName = $el.data( 'type' ) || 'default',
-						type = dep.types && dep.types[ typeName ],
-						options = !type && !dep.defaults ? {} : $.extend( {}, dep.defaults, type );
-					if ( initr.isDev ) {
-						console.log( '- Initr:run:$.fn - type is `' + typeName + '` with options', options, dep.handle, dep );
-					}
-					$el[ dep.handle ]( options );
-				});
-			}
-			this.addDone( dep, $els );
-		}
-	},
-	'$' : {
-		run : function( dep ) {
-			if ( !Initr.checkHandle( dep, window.$, '$' ) ) {
-				return;
-			}
-			if ( initr.isDev ) {
-				console.log( '- Initr:run:$ -', dep.handle, dep );
-			}
-			$[ dep.handle ]( dep.defaults );
-			this.addDone( dep, null );
-		}
-	},
-	'app' : {
-		run : function( dep, $els ) {
-			if ( !Initr.checkHandle( dep, window.app, 'app' ) ) {
-				return;
-			}
-			if ( initr.isDev ) {
-				console.log( '- Initr:run:app -', dep.handle, dep );
-			}
-			var module = app[ dep.handle ];
-			if ( module && module.init ) {
-				module.init( $els, dep );
-			}
-			this.addDone( dep, $els );
-		}
-	}
-};
-
-// Make a factory
-initr = function( rootPath, deps ) {
-	return new Initr( rootPath, deps );
-};
-
-initr.Initr = Initr;
-
-window.initr = initr;
-
-})( jQuery, window );
-
-
-
-
-
+    return Initr;
+});
