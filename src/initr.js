@@ -1,4 +1,4 @@
-define(['jquery', 'console'], function ($, console) {
+define(['module', 'jquery', 'console'], function (requireModule, $, _console) {
 
     /**
      * Any instance of Initr comes with defaults. Here is where you should define those defaults
@@ -15,36 +15,53 @@ define(['jquery', 'console'], function ($, console) {
     var defaults = {
         scope: document
     };
+
+    var consoleConfig = {
+        style: 'color:#09d;',
+        level: requireModule.config().logLevel || 'debug'
+    };
+
     /**
      * It is important to note that regardless of how many Initr instances are initialized, the modules collection is static across all instances
      * @type {object}
      * @private
      */
     var _modules = {};
-    var _console = console;
-    var console = {
-        _noop: function(){},
-        _style: 'color:#09d;',
-        _shim: function (functionName) {
-            var _style = this._style;
+    var ConsoleFactory = {
+        create: function (command, config, console) {
+
+            var levels = {
+                'log': 0,
+                'info': 1,
+                'debug': 2
+            };
+
+            var style = this._style;
+
             return function () {
+                if (levels[command] > levels[config.level]) {//if the log level is higher than the current commands level just exit out
+                    return;
+                }
                 //convert arguments to an array
-                var fn = _console[functionName] || _console.log;
+                var fn = console[command] || console.log;
                 var args = Array.prototype.slice.call(arguments, 0);
                 if (fn.apply) {
-                    args.unshift(_style);
+                    args.unshift(style);
                     args.unshift('%cInitr');
-                    fn.apply(_console, args);
+                    fn.apply(console, args);
                 } else {
                     args.unshift('Initr:');
                     fn(args);
                 }
-            }
+            };
         }
     };
-    console.log = console._shim('log');
-    console.info = console._shim('info');
-    console.debug = console._noop;//._shim('debug');
+    var console = {
+        _style: requireModule.config().config,
+        log: ConsoleFactory.create('log', consoleConfig, _console),
+        info: ConsoleFactory.create('info', consoleConfig, _console),
+        debug: ConsoleFactory.create('debug', consoleConfig, _console)
+    };
 
     /**
      * Initr has been redefined to use require.js.
@@ -54,7 +71,7 @@ define(['jquery', 'console'], function ($, console) {
      * @constructor
      * @exports Initr
      * @param {InitrConfig} config
-     * @version 1.4.0
+     * @version 2.0.0
      */
     function Initr(config) {
 
