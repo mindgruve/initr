@@ -36,7 +36,7 @@ An initr module has to be built a certain way. See below for an example.
 
 ```js
 //initr/form-ui.js
-define(['src/vendor/initr/module', 'jquery'], function (Module, $) {
+define(['vendor/initr/module', 'jquery'], function (Module, $) {
 	function FormUi(config, $els, initr) {
         Module.apply(this, [config, $els, initr]);
         this.init();
