@@ -2,6 +2,7 @@
   "name": "initr",
   "version": "2.0.0",
   "scripts": {
+	  "build": "cp src/initr.js dist/initr.js && uglifyjs dist/initr.js --output dist/initr.min.js"
   },
   "contributors": [
     {
@@ -14,5 +15,8 @@
       "email": "ckihneman@mindgruve.com",
       "url": "http://ckihneman.github.com"
     }
-  ]
+  ],
+  "devDependencies": {
+    "uglify-js": "^2.6.2"
+  }
 }
